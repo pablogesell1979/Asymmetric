@@ -5,33 +5,72 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tablero - Legado Asimétrico</title>
     <style>
-        :root { --bg-color: #0b0c10; --panel-color: #1a1d24; --text-color: #c5c6c7; --accent-gold: #c5a059; }
-        body { margin: 0; padding: 0; background-color: var(--bg-color); color: var(--text-color); font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; box-sizing: border-box; user-select: none; }
-        .turno-alerta { font-size: 1.4rem; font-weight: bold; text-align: center; padding: 12px 40px; background-color: var(--panel-color); border-radius: 6px; border-bottom: 3px solid #c5a059; letter-spacing: 1px; min-width: 420px; box-shadow: 0 4px 10px rgba(0,0,0,0.4); margin-bottom: 20px; transition: all 0.3s ease; display: flex; flex-direction: column; gap: 4px;}
-        .turno-sub { font-size: 0.9rem; font-weight: normal; color: #f39c12; }
-        .mesa-de-juego { display: flex; flex-direction: row; gap: 25px; justify-content: center; align-items: flex-start; }
-        .tablero-contenedor { background-image: url('TABLERO 9x9_2.jpg'); background-size: contain; background-repeat: no-repeat; background-position: center; padding: 4px; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.7); border: 2px solid #2a2d32; display: flex; flex-direction: column; align-items: center;}
-        #tablero { display: grid; grid-template-columns: repeat(9, 62px); grid-template-rows: repeat(9, 62px); width: 558px; height: 558px; position: relative; }
+        :root { 
+            --bg-color: #0b0c10; 
+            --panel-color: #1a1d24; 
+            --text-color: #c5c6c7; 
+            --accent-gold: #c5a059; 
+        }
         
-        .celda { border: 1px solid rgba(255, 255, 255, 0.0); display: flex; align-items: center; justify-content: center; width: 62px; height: 62px; box-sizing: border-box; position: relative; transition: background-color 0.2s; }
+        * { box-sizing: border-box; }
+        
+        body { 
+            margin: 0; padding: 15px; 
+            background-color: var(--bg-color); 
+            color: var(--text-color); 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            display: flex; flex-direction: column; align-items: center; justify-content: flex-start; 
+            min-height: 100vh; user-select: none; 
+        }
+        
+        .turno-alerta { 
+            font-size: 1.2rem; font-weight: bold; text-align: center; padding: 12px 20px; 
+            background-color: var(--panel-color); border-radius: 8px; border-bottom: 3px solid #c5a059; 
+            letter-spacing: 1px; width: 100%; max-width: 950px; box-shadow: 0 4px 10px rgba(0,0,0,0.4); 
+            margin-bottom: 15px; transition: all 0.3s ease; display: flex; flex-direction: column; gap: 4px;
+        }
+        .turno-sub { font-size: 0.85rem; font-weight: normal; color: #f39c12; }
+        
+        /* Flex en computadoras, Stack en celulares */
+        .mesa-de-juego { 
+            display: flex; flex-direction: row; gap: 20px; 
+            justify-content: center; align-items: flex-start; 
+            width: 100%; max-width: 950px;
+        }
+        
+        .tablero-contenedor { 
+            background-image: url('TABLERO 9x9_2.jpg'); background-size: contain; background-repeat: no-repeat; background-position: center; 
+            padding: 6px; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.7); border: 2px solid #2a2d32; 
+            display: flex; flex-direction: column; align-items: center; background-color: #000;
+        }
+        
+        /* Tablero de tamaño dinámico */
+        #tablero { 
+            display: grid; 
+            grid-template-columns: repeat(9, 62px); 
+            grid-template-rows: repeat(9, 62px); 
+            width: 558px; height: 558px; position: relative; 
+        }
+        
+        .celda { border: 1px solid rgba(255, 255, 255, 0.0); display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; position: relative; transition: background-color 0.2s; }
         .celda:hover { background-color: rgba(197, 160, 89, 0.2); cursor: pointer; }
         .celda.seleccionada { background-color: rgba(52, 152, 219, 0.4) !important; box-shadow: inset 0 0 8px #3498db; }
         .celda.destino-valido { background-color: rgba(128, 128, 128, 0.3) !important; box-shadow: inset 0 0 6px #888888; }
-        .celda.destino-valido::after { content: ''; width: 14px; height: 14px; background-color: var(--accent-gold); border-radius: 50%; position: absolute; z-index: 20; }
+        .celda.destino-valido::after { content: ''; width: 25%; height: 25%; background-color: var(--accent-gold); border-radius: 50%; position: absolute; z-index: 20; }
         .celda.captura-valida { background-color: rgba(231, 76, 60, 0.4) !important; box-shadow: inset 0 0 6px #e74c3c; }
 
         .muro-fuego { background-color: rgba(231, 76, 60, 0.6) !important; box-shadow: inset 0 0 15px #c0392b; }
-        .muro-fuego::before { content: '🔥'; position: absolute; font-size: 24px; z-index: 5; opacity: 0.8; pointer-events: none; }
+        .muro-fuego::before { content: '🔥'; position: absolute; font-size: 1.2rem; z-index: 5; opacity: 0.8; pointer-events: none; }
         .muro-hielo { background-color: rgba(52, 152, 219, 0.6) !important; box-shadow: inset 0 0 15px #2980b9; }
-        .muro-hielo::before { content: '🧊'; position: absolute; font-size: 24px; z-index: 5; opacity: 0.8; pointer-events: none; }
+        .muro-hielo::before { content: '🧊'; position: absolute; font-size: 1.2rem; z-index: 5; opacity: 0.8; pointer-events: none; }
         .zona-prohibida { background-color: rgba(155, 89, 182, 0.5) !important; box-shadow: inset 0 0 15px #8e44ad; }
-        .zona-prohibida::before { content: '☠️'; position: absolute; font-size: 24px; z-index: 5; opacity: 0.8; pointer-events: none; }
+        .zona-prohibida::before { content: '☠️'; position: absolute; font-size: 1.2rem; z-index: 5; opacity: 0.8; pointer-events: none; }
         .muro-arbol { background-color: rgba(39, 174, 96, 0.4) !important; box-shadow: inset 0 0 10px #27ae60; }
-        .muro-arbol::before { content: '🌲'; position: absolute; font-size: 28px; z-index: 5; opacity: 0.9; pointer-events: none; }
+        .muro-arbol::before { content: '🌲'; position: absolute; font-size: 1.4rem; z-index: 5; opacity: 0.9; pointer-events: none; }
 
-        .pieza-contenedor { width: 58px; height: 58px; display: flex; align-items: center; justify-content: center; position: relative; pointer-events: none; }
+        .pieza-contenedor { width: 90%; height: 90%; display: flex; align-items: center; justify-content: center; position: relative; pointer-events: none; }
         .pieza-contenedor img { width: 100%; height: 100%; object-fit: contain; display: none; z-index: 10; transform: scale(1.35); transform-origin: bottom center; filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.6)); }
-        .ficha-texto { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.9rem; color: #ffffff; text-shadow: 1px 1px 3px rgba(0,0,0,0.8); box-shadow: 0 4px 8px rgba(0,0,0,0.6); border: 2px solid #ffffff; z-index: 5; position: absolute; text-align: center;}
+        .ficha-texto { width: 75%; height: 75%; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.8rem; color: #ffffff; text-shadow: 1px 1px 3px rgba(0,0,0,0.8); box-shadow: 0 4px 8px rgba(0,0,0,0.6); border: 2px solid #ffffff; z-index: 5; position: absolute; text-align: center;}
         
         .elfos .ficha-texto { background: radial-gradient(circle, #2ecc71, #27ae60); }
         .magos .ficha-texto { background: radial-gradient(circle, #3498db, #2980b9); }
@@ -39,28 +78,29 @@
         .humanos .ficha-texto { background: radial-gradient(circle, #f39c12, #d35400); }
         .coloso .ficha-texto { background: radial-gradient(circle, #95a5a6, #7f8c8d); }
 
-        .estado-inmovilizado::after { content: '❄️'; position: absolute; top: -5px; right: -5px; font-size: 16px; z-index: 30; }
-        .estado-inmune::after { content: '🛡️'; position: absolute; top: -5px; left: -5px; font-size: 16px; z-index: 30; }
+        .estado-inmovilizado::after { content: '❄️'; position: absolute; top: -3px; right: -3px; font-size: 0.8rem; z-index: 30; }
+        .estado-inmune::after { content: '🛡️'; position: absolute; top: -3px; left: -3px; font-size: 0.8rem; z-index: 30; }
 
         .pieza-contenedor.j1 img { filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.6)) brightness(1.25) contrast(1.1); }
         .pieza-contenedor.j2 img { filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.6)) brightness(0.7) contrast(1.3) saturate(0.8); }
 
-        .columna-paneles { display: flex; flex-direction: column; gap: 20px; width: 340px; }
-        .panel-info { background-color: var(--panel-color); padding: 20px; border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.4); border: 1px solid #25282e; }
-        .panel-info h2 { margin-top: 0; border-bottom: 2px solid var(--accent-gold); padding-bottom: 6px; font-size: 1.3rem; color: var(--accent-gold); letter-spacing: 0.5px; }
+        .columna-paneles { display: flex; flex-direction: column; gap: 15px; width: 340px; flex-shrink: 0; }
+        .panel-info { background-color: var(--panel-color); padding: 15px; border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.4); border: 1px solid #25282e; }
+        .panel-info h2 { margin-top: 0; border-bottom: 2px solid var(--accent-gold); padding-bottom: 6px; font-size: 1.2rem; color: var(--accent-gold); letter-spacing: 0.5px; }
+        
         .contenedor-conjuros { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
-        .btn-conjuro { width: 100%; padding: 10px 12px; background-color: #2980b9; border: none; border-radius: 4px; color: white; font-weight: bold; text-align: left; cursor: pointer; transition: background 0.2s; font-size: 0.85rem; display: flex; flex-direction: column; gap: 2px; }
-        .btn-conjuro .sub { font-size: 0.75rem; font-weight: normal; opacity: 0.8; }
-        .btn-conjuro:hover:not(:disabled) { background-color: #3498db; }
+        .btn-conjuro { width: 100%; padding: 12px; background-color: #2980b9; border: none; border-radius: 6px; color: white; font-weight: bold; text-align: left; cursor: pointer; transition: background 0.2s; font-size: 0.95rem; display: flex; flex-direction: column; gap: 3px; }
+        .btn-conjuro .sub { font-size: 0.75rem; font-weight: normal; opacity: 0.85; }
+        .btn-conjuro:hover:not(:disabled), .btn-conjuro:active:not(:disabled) { background-color: #3498db; }
         .btn-conjuro:disabled { background-color: #2c3e50; color: #7f8c8d; cursor: not-allowed; }
         
-        #btn-cancelar { display: none; width: 100%; margin-top: 15px; padding: 12px; background-color: #c0392b; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.5);}
-        #btn-cancelar:hover { background-color: #e74c3c; }
-        .info-vacia { font-style: italic; color: #7f8c8d; font-size: 0.9rem; text-align: center; }
+        #btn-cancelar { display: none; width: 100%; margin-top: 15px; padding: 14px; background-color: #c0392b; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; text-align: center; font-size: 1rem; box-shadow: 0 2px 5px rgba(0,0,0,0.5);}
+        #btn-cancelar:hover, #btn-cancelar:active { background-color: #e74c3c; }
+        .info-vacia { font-style: italic; color: #7f8c8d; font-size: 0.9rem; text-align: center; padding: 10px 0; }
         
         .panel-humanos { border-left: 4px solid #f39c12; display: none; }
         .nivel-caja { background: #2c3e50; padding: 10px; border-radius: 6px; margin-top: 10px; border: 1px solid #34495e; }
-        .nivel-titulo { font-size: 1.1rem; color: #f1c40f; font-weight: bold; }
+        .nivel-titulo { font-size: 1rem; color: #f1c40f; font-weight: bold; }
         .nivel-desc { font-size: 0.85rem; color: #bdc3c7; margin-top: 4px; }
         .progreso-bar { width: 100%; background: #111; height: 8px; border-radius: 4px; margin-top: 8px; overflow: hidden; }
         .progreso-fill { background: #f39c12; height: 100%; width: 0%; transition: width 0.3s; }
@@ -68,17 +108,17 @@
         .panel-coloso { border-left: 4px solid #95a5a6; display: none; }
 
         .reloj-jugador {
-            background-color: var(--panel-color); border: 2px solid #333; padding: 10px 20px;
-            border-radius: 6px; font-size: 1.3rem; font-weight: bold; width: 100%; box-sizing: border-box;
+            background-color: var(--panel-color); border: 2px solid #333; padding: 10px 15px;
+            border-radius: 6px; font-size: 1.1rem; font-weight: bold; width: 100%;
             display: flex; justify-content: space-between; align-items: center; transition: all 0.3s ease;
         }
-        .reloj-arriba { margin-bottom: 10px; }
-        .reloj-abajo { margin-top: 10px; }
+        .reloj-arriba { margin-bottom: 8px; }
+        .reloj-abajo { margin-top: 8px; }
         .reloj-activo { border-color: var(--accent-gold); color: var(--accent-gold); box-shadow: 0 0 15px rgba(197, 160, 89, 0.4); }
         .reloj-inactivo { border-color: #2a2d32; color: #555; opacity: 0.7; }
         .reloj-peligro { color: #e74c3c !important; animation: latido 1s infinite; border-color: #e74c3c; box-shadow: 0 0 15px rgba(231, 76, 60, 0.5); }
         @keyframes latido { 0% { transform: scale(1); } 50% { transform: scale(1.02); } 100% { transform: scale(1); } }
-        .tiempo-display { font-family: monospace; font-size: 1.6rem; letter-spacing: 2px; }
+        .tiempo-display { font-family: monospace; font-size: 1.4rem; letter-spacing: 1px; }
 
         /* --- ANIMACIONES DE ELIMINACIÓN --- */
         @keyframes muerteEfecto {
@@ -95,8 +135,46 @@
             0% { background-color: rgba(231, 76, 60, 0.8) !important; box-shadow: inset 0 0 20px #c0392b !important; }
             100% { background-color: transparent; box-shadow: none; }
         }
-        .flash-sangre {
-            animation: flashSangre 0.5s ease-out forwards;
+        .flash-sangre { animation: flashSangre 0.5s ease-out forwards; }
+
+        /* --- ADAPTACIÓN RESPONSIVA PARA SMARTPHONES --- */
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            
+            .mesa-de-juego { 
+                flex-direction: column; 
+                align-items: center; 
+                gap: 15px; 
+            }
+            
+            .columna-paneles { 
+                width: 100%; 
+                max-width: 380px; 
+            }
+            
+            /* Ajuste proporcional del tablero (38px x 9 = 342px de ancho perfecto para pantallas chicas) */
+            #tablero { 
+                grid-template-columns: repeat(9, 38px); 
+                grid-template-rows: repeat(9, 38px); 
+                width: 342px; height: 342px; 
+            }
+            
+            .ficha-texto { font-size: 0.65rem; border-width: 1px; }
+            .muro-fuego::before, .muro-hielo::before, .zona-prohibida::before { font-size: 0.9rem; }
+            .muro-arbol::before { font-size: 1rem; }
+            
+            .turno-alerta { font-size: 1rem; padding: 10px; }
+            .reloj-jugador { font-size: 0.95rem; padding: 8px 12px; }
+            .tiempo-display { font-size: 1.2rem; }
+        }
+
+        /* Pantallas intermedias (tablets y celulares anchos) */
+        @media (min-width: 769px) and (max-width: 980px) {
+            #tablero { 
+                grid-template-columns: repeat(9, 48px); 
+                grid-template-rows: repeat(9, 48px); 
+                width: 432px; height: 432px; 
+            }
         }
     </style>
 </head>
@@ -358,9 +436,10 @@
                 fantasma.classList.add('animacion-muerte');
                 fantasma.style.position = 'absolute';
                 
+                const factorProporcion = (window.innerWidth <= 768) ? 38 : (window.innerWidth <= 980) ? 48 : 62;
                 const [f, c] = id.split('-');
-                fantasma.style.top = (f * 62 + 2) + 'px'; 
-                fantasma.style.left = (c * 62 + 2) + 'px';
+                fantasma.style.top = (f * factorProporcion + 2) + 'px'; 
+                fantasma.style.left = (c * factorProporcion + 2) + 'px';
                 
                 document.getElementById('tablero').appendChild(fantasma);
                 celda.classList.add('flash-sangre');
@@ -376,7 +455,7 @@
 
         function manejarClickCelda(f, c) {
             const esTurnoCPU = (turnoActual === 1 && j1EsCPU) || (turnoActual === 2 && j2EsCPU);
-            if (esTurnoCPU) return; // Bloquear clicks humanos si juega la CPU
+            if (esTurnoCPU) return; 
 
             const idClickeado = `${f}-${c}`;
 
@@ -546,8 +625,6 @@
                             }
                         }
                         else if (pieza.texto === 'RO') {
-                            // FIX: La roca solo evalúa sus movimientos si tiene un brazo adyacente. 
-                            // Esto evita que la CPU se "salte" la regla
                             if (tieneBrazoAdyacente(fila, col, pieza.jugador)) {
                                 if (diffF === diffC || diffF === 0 || diffC === 0) {
                                     esValido = lineaDespejada(fila, col, f, c);
@@ -1054,7 +1131,6 @@
             actualizarPanelColoso();
             actualizarPanelAcciones(null);
 
-            // --- LLAMADA A LA IA SI LE TOCA JUGAR ---
             setTimeout(verificarTurnoCPU, 300);
         }
 
@@ -1199,11 +1275,9 @@
                     let [ef, ec] = id.split('-').map(Number);
 
                     let diffF = Math.abs(ef - fila); let diffC = Math.abs(ec - col);
-                    // Proyectiles y magias a larga distancia
                     if (p.texto === 'AR' && diffC === 0 && diffF <= 5) return true;
                     if (p.texto === 'MR' && (diffF <= 3 && diffC <= 3)) return true;
                     if (['MA', 'DR', 'AP'].includes(p.texto) && diffF <= 2 && diffC <= 2) return true;
-                    // Contacto
                     if (diffF <= 1 && diffC <= 1) return true;
                 }
             }
@@ -1463,7 +1537,6 @@
             actualizarPanelHumanos();
             actualizarPanelColoso();
 
-            // Arrancar IA si el jugador 1 es CPU
             setTimeout(verificarTurnoCPU, 800);
         }
 
