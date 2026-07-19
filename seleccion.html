@@ -19,7 +19,7 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.7); border: 2px solid #c5a059;
             text-align: center; 
             width: 100%;
-            max-width: 700px; /* Se mantiene elegante en PC pero usa todo el ancho en móvil */
+            max-width: 700px;
         }
         .logo { 
             width: 100%; 
@@ -57,7 +57,6 @@
         }
         .opciones-tiempo label:hover { color: #fff; border-color: #c5a059; }
         
-        /* Flexbox responsivo: en PC al lado, en móvil apilado */
         .area-seleccion { 
             display: flex; 
             flex-direction: row; 
@@ -121,13 +120,12 @@
         }
         .btn-iniciar:hover, .btn-iniciar:active { background-color: #27ae60; }
 
-        /* --- ADAPTACIÓN EXCLUSIVA PARA PANTALLAS CHICAS (CELULARES) --- */
+        /* --- ADAPTACIÓN RESPONSIVA PARA CELULARES --- */
         @media (max-width: 768px) {
             body { padding: 10px; justify-content: flex-start; }
             .contenedor { padding: 15px; border-width: 1px; }
             .logo { max-width: 260px; margin-bottom: 15px; }
             
-            /* Apilar jugadores verticalmente */
             .area-seleccion {
                 flex-direction: column;
                 gap: 15px;
@@ -140,7 +138,7 @@
                 border: 1px dashed #333;
                 padding: 5px 0;
             }
-            .vista-previa { height: 200px; } /* Reducir altura de imagen para evitar tanto scroll */
+            .vista-previa { height: 200px; }
             .info-faccion { min-height: auto; }
             .opciones-tiempo { gap: 8px; }
             .opciones-tiempo label { flex: 1; justify-content: center; font-size: 0.85rem; padding: 8px 4px; }
@@ -150,7 +148,8 @@
 <body>
 
     <div class="contenedor">
-        <img src="LogoSolo.PNG" alt="Legado Asymmetric Chess" class="logo">
+        <!-- Logo con detección automática de extensión -->
+        <img src="LogoSolo.PNG" alt="Legado Asymmetric Chess" class="logo" onerror="corregirExtension(this)">
 
         <!-- PANEL DE TIEMPO -->
         <div class="panel-tiempo">
@@ -174,7 +173,8 @@
                 </div>
 
                 <label style="font-weight: bold; color: #c5a059;">Jugador 1 (Abajo)</label>
-                <div class="vista-previa"><img id="img-j1" src="SelectMago1.PNG" alt="J1"></div>
+                <!-- Imagen con detección automática de extensión -->
+                <div class="vista-previa"><img id="img-j1" src="SelectMago1.PNG" alt="J1" onerror="corregirExtension(this)"></div>
                 <select id="fac-j1" onchange="actualizarImagen(1)">
                     <option value="Mago">Magos</option>
                     <option value="Elfo">Elfos</option>
@@ -198,7 +198,8 @@
                 </div>
 
                 <label style="font-weight: bold; color: #c5a059;">Jugador 2 (Arriba)</label>
-                <div class="vista-previa"><img id="img-j2" src="SelectMago2.PNG" alt="J2"></div>
+                <!-- Imagen con detección automática de extensión -->
+                <div class="vista-previa"><img id="img-j2" src="SelectMago2.PNG" alt="J2" onerror="corregirExtension(this)"></div>
                 <select id="fac-j2" onchange="actualizarImagen(2)">
                     <option value="Mago">Magos</option>
                     <option value="Elfo">Elfos</option>
@@ -237,12 +238,36 @@
             }
         };
 
+        // Sistema de auto-recuperación de imágenes para servidores Linux (GitHub Pages)
+        function corregirExtension(img) {
+            if (!img.getAttribute('reintentado')) {
+                img.setAttribute('reintentado', '1');
+                if (img.src.endsWith('.PNG')) {
+                    img.src = img.src.replace('.PNG', '.png');
+                } else if (img.src.endsWith('.png')) {
+                    img.src = img.src.replace('.png', '.PNG');
+                } else if (img.src.endsWith('.JPG')) {
+                    img.src = img.src.replace('.JPG', '.jpg');
+                } else if (img.src.endsWith('.jpg')) {
+                    img.src = img.src.replace('.jpg', '.JPG');
+                }
+            } else if (img.getAttribute('reintentado') === '1') {
+                // Segundo reintento por si todo el nombre está en minúsculas (ej. selectmago1.png)
+                img.setAttribute('reintentado', '2');
+                let partes = img.src.split('/');
+                let archivo = partes.pop().toLowerCase();
+                img.src = partes.join('/') + '/' + archivo;
+            }
+        }
+
         function actualizarImagen(jugador) {
             const selector = document.getElementById(`fac-j${jugador}`);
             const imagen = document.getElementById(`img-j${jugador}`);
             const panelInfo = document.getElementById(`info-j${jugador}`);
             const faccion = selector.value;
             
+            // Reseteamos el historial de reintentos para la nueva imagen
+            imagen.removeAttribute('reintentado');
             imagen.src = `Select${faccion}${jugador}.PNG`;
 
             const info = datosFacciones[faccion];
