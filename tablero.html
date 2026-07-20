@@ -69,7 +69,10 @@
         .muro-arbol::before { content: '🌲'; position: absolute; font-size: 1.4rem; z-index: 5; opacity: 0.9; pointer-events: none; }
 
         .pieza-contenedor { width: 90%; height: 90%; display: flex; align-items: center; justify-content: center; position: relative; pointer-events: none; }
-        .pieza-contenedor img { width: 100%; height: 100%; object-fit: contain; display: none; z-index: 10; transform: scale(1.35); transform-origin: bottom center; filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.6)); }
+        
+        /* EFECTOS DE LUZ Y SOMBRA ELIMINADOS SEGÚN SOLICITUD */
+        .pieza-contenedor img { width: 100%; height: 100%; object-fit: contain; display: none; z-index: 10; transform: scale(1.35); transform-origin: bottom center; }
+        
         .ficha-texto { width: 75%; height: 75%; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.8rem; color: #ffffff; text-shadow: 1px 1px 3px rgba(0,0,0,0.8); box-shadow: 0 4px 8px rgba(0,0,0,0.6); border: 2px solid #ffffff; z-index: 5; position: absolute; text-align: center;}
         
         .elfos .ficha-texto { background: radial-gradient(circle, #2ecc71, #27ae60); }
@@ -80,9 +83,6 @@
 
         .estado-inmovilizado::after { content: '❄️'; position: absolute; top: -3px; right: -3px; font-size: 0.8rem; z-index: 30; }
         .estado-inmune::after { content: '🛡️'; position: absolute; top: -3px; left: -3px; font-size: 0.8rem; z-index: 30; }
-
-        .pieza-contenedor.j1 img { filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.6)) brightness(1.25) contrast(1.1); }
-        .pieza-contenedor.j2 img { filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.6)) brightness(0.7) contrast(1.3) saturate(0.8); }
 
         .columna-paneles { display: flex; flex-direction: column; gap: 15px; width: 340px; flex-shrink: 0; }
         .panel-info { background-color: var(--panel-color); padding: 15px; border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.4); border: 1px solid #25282e; }
@@ -427,30 +427,38 @@
                 actualizarPanelHumanos();
             }
 
-            // --- EFECTO VISUAL DE MUERTE ---
+            // --- EFECTO VISUAL DE MUERTE CORREGIDO ---
             const celda = document.getElementById(`c-${id}`);
             const piezaVisual = celda.querySelector('.pieza-contenedor');
+            let fantasma = null;
             
             if (piezaVisual) {
-                const fantasma = piezaVisual.cloneNode(true);
+                fantasma = piezaVisual.cloneNode(true);
                 fantasma.classList.add('animacion-muerte');
+                
+                // Forzamos posicionamiento y tamaño relativo a la celda para que escale perfecto
                 fantasma.style.position = 'absolute';
+                fantasma.style.top = '0';
+                fantasma.style.left = '0';
+                fantasma.style.width = '100%';
+                fantasma.style.height = '100%';
                 
-                const factorProporcion = (window.innerWidth <= 768) ? 38 : (window.innerWidth <= 980) ? 48 : 62;
-                const [f, c] = id.split('-');
-                fantasma.style.top = (f * factorProporcion + 2) + 'px'; 
-                fantasma.style.left = (c * factorProporcion + 2) + 'px';
-                
-                document.getElementById('tablero').appendChild(fantasma);
                 celda.classList.add('flash-sangre');
-                
                 setTimeout(() => { celda.classList.remove('flash-sangre'); }, 500);
-                setTimeout(() => { fantasma.remove(); }, 600);
             }
             // --- FIN EFECTO VISUAL ---
 
-            document.getElementById(`c-${id}`).innerHTML = '';
+            // Eliminamos la pieza lógicamente
+            celda.innerHTML = '';
             delete mapaPiezas[id];
+
+            // Reinsertamos el fantasma en la celda vaciada temporalmente
+            if (fantasma) {
+                celda.appendChild(fantasma);
+                setTimeout(() => { 
+                    if(fantasma.parentNode) fantasma.remove(); 
+                }, 600);
+            }
         }
 
         function manejarClickCelda(f, c) {
