@@ -60,7 +60,8 @@
 </head>
 <body>
 
-    <img src="LogoSolo.PNG" alt="Legado Asymmetric Chess" class="logo">
+    <!-- Extensión corregida a minúsculas -->
+    <img src="LogoSolo.png" alt="Legado Asymmetric Chess" class="logo">
     
     <h1 class="titulo-victoria">¡VICTORIA!</h1>
     <div class="subtitulo" id="texto-ganador">Cargando resultado...</div>
@@ -86,8 +87,11 @@
                 document.getElementById('texto-ganador').innerText = 
                     `¡EL JUGADOR ${datosPartida.ganador} HA DOMINADO EL CAMPO DE BATALLA!`;
                 
-                // Actualizamos la imagen
-                document.getElementById('img-ganador').src = datosPartida.imgGanador;
+                // Forzamos que la extensión enviada pase de .PNG (si lo estuviera) a .png
+                let rutaCorregida = datosPartida.imgGanador.replace('.PNG', '.png');
+                
+                // Actualizamos la imagen con la ruta corregida
+                document.getElementById('img-ganador').src = rutaCorregida;
                 
             } else {
                 document.getElementById('texto-ganador').innerText = "No se encontraron datos de la partida.";
